@@ -1,0 +1,4 @@
+*.class
+*.log
+src/main/resources/application.conf
+hs_err_pid*
