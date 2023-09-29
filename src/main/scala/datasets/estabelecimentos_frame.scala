@@ -1,4 +1,4 @@
-package treatment
+package datasets
 
 import org.apache.spark.sql
 import projectConfigs._
