@@ -1,0 +1,2 @@
+DIR_DATASETS = parent directory with dataset folders
+TREATED_DIR = dir path to store .parquet files
