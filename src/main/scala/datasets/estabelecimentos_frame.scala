@@ -1,17 +1,17 @@
 package datasets
 
 import org.apache.spark.sql
-import projectConfigs._
+import environment.projectConfigs.rootPath
 import org.apache.spark.sql.functions
 import org.apache.spark.sql.functions.{col, lit, when}
-import org.apache.spark.sql.types.{ByteType, IntegerType, ShortType, StringType}
+import org.apache.spark.sql.types.{ByteType, IntegerType, StringType}
 
-object estabelecimentos_frame {
-  val ss = initSparkSession.initSpark
+object EstabelecimentosFrame {
+  private val ss = initSparkSession.initSpark
 
-  def read_csv_estabelec_files(subDir:String, delimiter:String=";"): sql.DataFrame = {
-    val dirPath: String = s"$rootPath\\$subDir\\"
-    val mainDataframe: sql.DataFrame = ss.read.option("delimiter", delimiter).csv(dirPath)
+  def estabelecimentosTreatment: sql.DataFrame = {
+    val dirPath: String = s"$rootPath\\estabelecimentos\\"
+    val mainDataframe: sql.DataFrame = ss.read.option("delimiter", ";").csv(dirPath)
 
     val estabelecColumns: Seq[String] = Seq(
       "cnpj_basico", "cnpj_ordem", "cnpj_dv", "identif_matriz_filial", "nome_fantasia", "situ_cadastral",
@@ -27,7 +27,7 @@ object estabelecimentos_frame {
       dataFrameRenamedColumns = dataFrameRenamedColumns.withColumnRenamed(s"_c$idx", estabelecColumns(idx))
     }
 
-    val dataFrameRemovedColumns = dataFrameRenamedColumns.drop("ddd2", "telefone2", "ddd_fax", "fax", "nm_cidade_ext")
+    val dataFrameRemovedColumns = dataFrameRenamedColumns.drop("ddd2", "telefone2", "ddd_fax", "fax", "nm_cidade_ext", "tp_lograd", "numero", "complemento", "bairro","cd_municipio", "ddd1", "telefone1", "email")
 
     val dataFrameUfTreated = dataFrameRemovedColumns.withColumn("uf",
       when(functions.length(col("uf")) === 2, col("uf"))
@@ -46,21 +46,9 @@ object estabelecimentos_frame {
       .withColumn("data_inicio_atv", col("data_inicio_atv").cast(IntegerType))
       .withColumn("cnae_fiscal_prim", col("cnae_fiscal_prim").cast(IntegerType))
       .withColumn("cnae_fiscal_sec", col("cnae_fiscal_sec").cast(StringType))
-      .withColumn("tp_lograd", col("tp_lograd").cast(StringType))
-      .withColumn("numero", col("numero").cast(ShortType))
-      .withColumn("complemento", col("complemento").cast(StringType))
-      .withColumn("bairro", col("bairro").cast(StringType))
       .withColumn("cep", col("cep").cast(IntegerType))
-      .withColumn("cd_municipio", col("cd_municipio").cast(ShortType))
-      .withColumn("ddd1", col("ddd1").cast(ByteType))
-      .withColumn("telefone1", col("telefone1").cast(IntegerType))
-      .withColumn("email", col("email").cast(StringType))
-      .withColumn("situ_espec", col("email").cast(StringType))
+      .withColumn("situ_espec", col("situ_espec").cast(StringType))
 
     dfCastedTypes
   }
-
-
-
 }
-
